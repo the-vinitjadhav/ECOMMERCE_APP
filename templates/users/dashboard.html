@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - ShopHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Welcome Section -->
+    <div class="hero fade-in" style="text-align: left; color: white;">
+        <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+        <p>Welcome back, {{ session.username }}! ({{ session.role }})</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card fade-in">
+            <div class="stat-number">
+                {% if role == 'Admin' %}
+                    {{ users|length if users else 0 }}
+                {% elif role == 'Seller' %}
+                    {{ products|length if products else 0 }}
+                {% else %}
+                    {{ orders|length if orders else 0 }}
+                {% endif %}
+            </div>
+            <div class="stat-label">
+                {% if role == 'Admin' %}
+                    Total Users
+                {% elif role == 'Seller' %}
+                    Your Products
+                {% else %}
+                    Your Orders
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="stat-card fade-in">
+            <div class="stat-number" style="color: #4cc9f0;">
+                {% if role == 'Seller' %}
+                    {{ products|selectattr('Stock', 'gt', 0)|list|length if products else 0 }}
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+            <div class="stat-label">In Stock</div>
+        </div>
+        
+        <div class="stat-card fade-in">
+            <div class="stat-number" style="color: #f8961e;">
+                {% if role == 'Seller' %}
+                    {{ products|selectattr('Stock', 'le', 10)|list|length if products else 0 }}
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+            <div class="stat-label">Low Stock</div>
+        </div>
+        
+        <div class="stat-card fade-in">
+            <div class="stat-number" style="color: #4895ef;">
+                {{ session.user_id }}
+            </div>
+            <div class="stat-label">Your ID</div>
+        </div>
+    </div>
+
+    <!-- Role-specific Content -->
+    {% if role == 'Seller' %}
+    <!-- Seller Dashboard -->
+    <div class="card fade-in">
+        <div class="card-header">
+            <h2 style="margin: 0; color: white;"><i class="fas fa-boxes"></i> Your Products</h2>
+        </div>
+        <div class="card-body">
+            {% if products %}
+            <div class="product-grid">
+                {% for product in products %}
+                <div class="product-card">
+                    <div class="product-image">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">{{ product.Name }}</h3>
+                        <div class="product-price">${{ "%.2f"|format(product.Price) }}</div>
+                        <div class="product-stock">
+                            <span class="badge {% if product.Stock > 10 %}badge-success{% elif product.Stock > 0 %}badge-warning{% else %}badge-danger{% endif %}">
+                                {{ product.Stock }} in stock
+                            </span>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                            <a href="{{ url_for('products.edit_product', product_id=product.ProductID) }}" class="btn btn-primary" style="flex: 1;">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 2rem;">
+                <i class="fas fa-box-open" style="font-size: 3rem; color: #6c757d;"></i>
+                <p>No products yet. <a href="{{ url_for('products.add_product') }}">Add your first product!</a></p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% elif role == 'Admin' %}
+    <!-- Admin Dashboard -->
+    <div class="grid grid-2">
+        <div class="card fade-in">
+            <div class="card-header">
+                <h3 style="margin: 0; color: white;"><i class="fas fa-users"></i> Users</h3>
+            </div>
+            <div class="card-body">
+                {% if users %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user.UserID }}</td>
+                                <td>{{ user.Username }}</td>
+                                <td>{{ user.Email }}</td>
+                                <td><span class="badge {% if user.Role == 'Admin' %}badge-success{% else %}badge-primary{% endif %}">{{ user.Role }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p>No users found.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card fade-in">
+            <div class="card-header">
+                <h3 style="margin: 0; color: white;"><i class="fas fa-shopping-cart"></i> Recent Orders</h3>
+            </div>
+            <div class="card-body">
+                {% if orders %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>User ID</th>
+                                <th>Product ID</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders[:5] %}
+                            <tr>
+                                <td>{{ order.OrderID }}</td>
+                                <td>{{ order.UserID }}</td>
+                                <td>{{ order.ProductID }}</td>
+                                <td>{{ order.Quantity }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p>No orders found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    {% else %}
+    <!-- Customer Dashboard -->
+    <div class="card fade-in">
+        <div class="card-header">
+            <h2 style="margin: 0; color: white;"><i class="fas fa-history"></i> Recent Activity</h2>
+        </div>
+        <div class="card-body">
+            <div style="text-align: center; padding: 2rem;">
+                <i class="fas fa-shopping-bag" style="font-size: 4rem; color: #4361ee;"></i>
+                <h3>Welcome to ShopHub!</h3>
+                <p>Start shopping by browsing our products collection.</p>
+                <a href="{{ url_for('products.home') }}" class="btn btn-primary">
+                    <i class="fas fa-shopping-cart"></i> Start Shopping
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

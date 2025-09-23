@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Home - ShopHub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="hero fade-in">
+        <h1>Welcome to ShopHub 🛍️</h1>
+        <p>Discover amazing products at great prices</p>
+        
+        {% if not session.user_id %}
+        <div style="margin-top: 2rem;">
+            <a href="{{ url_for('users.register') }}" class="btn btn-primary" style="margin-right: 1rem;">
+                <i class="fas fa-user-plus"></i> Join Now
+            </a>
+            <a href="{{ url_for('users.login') }}" class="btn btn-outline">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Featured Products -->
+    <div class="card fade-in">
+        <div class="card-header">
+            <h2 style="margin: 0; color: white;"><i class="fas fa-star"></i> Featured Products</h2>
+        </div>
+        <div class="card-body">
+            {% if products %}
+            <div class="product-grid">
+                {% for product in products %}
+                <div class="product-card">
+                    <div class="product-image">
+                        <i class="fas fa-{{ 'mobile-alt' if 'phone' in product.Name.lower() else 'laptop' if 'laptop' in product.Name.lower() else 'tshirt' }}"></i>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">{{ product.Name }}</h3>
+                        <div class="product-price">${{ "%.2f"|format(product.Price) }}</div>
+                        <div class="product-stock">
+                            <span class="badge {% if product.Stock > 10 %}badge-success{% elif product.Stock > 0 %}badge-warning{% else %}badge-danger{% endif %}">
+                                {{ product.Stock }} in stock
+                            </span>
+                        </div>
+                        <p style="color: #6c757d; margin-bottom: 1rem; font-size: 0.9rem;">
+                            {{ product.Description[:100] if product.Description else 'No description available' }}...
+                        </p>
+                        <div style="display: flex; gap: 0.5rem;">
+                            {% if session.user_id and session.role == 'Customer' %}
+                            <a href="{{ url_for('orders.place_order', product_id=product.ProductID) }}" class="btn btn-primary" style="flex: 1;">
+                                <i class="fas fa-shopping-cart"></i> Buy Now
+                            </a>
+                            {% elif not session.user_id %}
+                            <a href="{{ url_for('users.login') }}" class="btn btn-primary" style="flex: 1;">
+                                <i class="fas fa-sign-in-alt"></i> Login to Buy
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 3rem;">
+                <i class="fas fa-box-open" style="font-size: 4rem; color: #6c757d; margin-bottom: 1rem;"></i>
+                <h3>No Products Available</h3>
+                <p>Check back later for new products!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="grid grid-3" style="margin-top: 3rem;">
+        <div class="card">
+            <div class="card-body" style="text-align: center;">
+                <i class="fas fa-shipping-fast" style="font-size: 3rem; color: #4361ee; margin-bottom: 1rem;"></i>
+                <h3>Fast Delivery</h3>
+                <p>Get your products delivered quickly and safely</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-body" style="text-align: center;">
+                <i class="fas fa-shield-alt" style="font-size: 3rem; color: #4cc9f0; margin-bottom: 1rem;"></i>
+                <h3>Secure Payment</h3>
+                <p>Your transactions are protected and secure</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-body" style="text-align: center;">
+                <i class="fas fa-headset" style="font-size: 3rem; color: #4895ef; margin-bottom: 1rem;"></i>
+                <h3>24/7 Support</h3>
+                <p>We're here to help you anytime</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

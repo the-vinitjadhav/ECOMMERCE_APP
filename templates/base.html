@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}E-Commerce App{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="{{ url_for('products.home') }}" class="logo">
+                    <i class="fas fa-shopping-bag"></i> Shop<span>Hub</span>
+                </a>
+                
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('products.home') }}" class="nav-link {% if request.endpoint == 'products.home' %}active{% endif %}">
+                        <i class="fas fa-home"></i> Home
+                    </a></li>
+                    
+                    {% if session.user_id %}
+                        <li><a href="{{ url_for('users.dashboard') }}" class="nav-link {% if request.endpoint == 'users.dashboard' %}active{% endif %}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a></li>
+                        
+                        {% if session.role == 'Seller' %}
+                        <li><a href="{{ url_for('products.add_product') }}" class="nav-link {% if request.endpoint == 'products.add_product' %}active{% endif %}">
+                            <i class="fas fa-plus"></i> Add Product
+                        </a></li>
+                        {% endif %}
+                        
+                        <li><a href="{{ url_for('orders.view_orders') }}" class="nav-link {% if request.endpoint == 'orders.view_orders' %}active{% endif %}">
+                            <i class="fas fa-shopping-cart"></i> Orders
+                        </a></li>
+                        
+                        <li class="user-info">
+                            <span class="username"><i class="fas fa-user"></i> {{ session.username }} ({{ session.role }})</span>
+                            <a href="{{ url_for('users.logout') }}" class="btn btn-outline">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+                    {% else %}
+                        <li><a href="{{ url_for('users.login') }}" class="nav-link {% if request.endpoint == 'users.login' %}active{% endif %}">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a></li>
+                        <li><a href="{{ url_for('users.register') }}" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i> Register
+                        </a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} fade-in">
+                        <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer style="background: rgba(0,0,0,0.8); color: white; padding: 2rem 0; margin-top: 3rem;">
+        <div class="container">
+            <div style="text-align: center;">
+                <p>&copy; 2025 ShopHub E-Commerce. All rights reserved.</p>
+                <p>Built with <i class="fas fa-heart" style="color: var(--danger);"></i> using Flask</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Add fade-in animation to all cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card, .product-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.classList.add('fade-in');
+            });
+        });
+    </script>
+</body>
+</html>
