@@ -344,8 +344,8 @@ python app.py
 <div align="center">
 
 *Built with ❤️ using Flask, Python, and modern web technologies*
+🚨 There's one error since I can't spoonfeed you, so just check for that! 🚨
 
 </div>
 ```
-🚨 There's one error since I can't spoonfeed you, so just check for that! 🚨
 
