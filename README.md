@@ -339,6 +339,8 @@ python app.py
 
 </div>
 
+<p align="left"> <img src="https://komarev.com/ghpvc/?username=the-vinitjadhav&label=Profile%20views&color=0e75b6&style=flat" alt="the-vinitjadhav" /> </p>
+
 ---
 
 <div align="center">
