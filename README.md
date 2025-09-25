@@ -339,7 +339,8 @@ python app.py
 
 </div>
 
-![Total Views](https://visitor-badge.glitch.me/badge?page_id=the-vinitjadhav.ECOMMERCE_APP)
+![Visitors](https://visitor-badge.laobi.icu/badge?page_id=the-vinitjadhav.ECOMMERCE_APP)
+
 
 ---
 
